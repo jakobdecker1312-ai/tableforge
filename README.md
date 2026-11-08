@@ -1,10 +1,11 @@
-# ⚔️ Tableforge
+# ⚔️ Tavern Roll
 
 Ein schlankes D&D Virtual Tabletop mit Echtzeit-Sync.
 
 **Funktionen:** Tische erstellen/beitreten · Live-Presence und Cursor · Tokens per Drag & Drop (mit Größen) ·
 DM-/Spieler-Rolle · Hintergrundbild · Zoom · Nebel des Krieges mit dynamischer Sicht · Würfellog mit
-verdeckten DM-Würfen · Initiative-Tracker
+verdeckten DM-Würfen · Initiative-Tracker · animierter DM-Schirm mit Notizen und Begegnungs-Tracker ·
+Bücher (Monster, Zustände, Regeln, NPCs) · Charakterbögen mit Würfelintegration, Export und Import
 
 **Stack:** Next.js 15 (App Router) · TypeScript · Tailwind CSS 4 · Liveblocks · uuid
 
@@ -72,3 +73,11 @@ src/
     ├── DiceLog.tsx               Würfel und Verlauf
     └── InitiativeTracker.tsx     Kampfreihenfolge
 ```
+
+## Hinweise zu den neuen Funktionen
+
+- **Bücher:** Monster, Zustände und Regeln basieren auf dem System Reference Document 5.1 von Wizards of
+  the Coast (CC BY 4.0), sinngemäß ins Deutsche übertragen. Neue Einträge ergänzt du in `src/data/`.
+- **Private DM-Daten:** DM-Notizen und das NPC-Verzeichnis liegen nur im Browser der DM (localStorage).
+- **Charakterbögen:** Sie liegen im geteilten Tisch-Speicher. Bearbeiten dürfen nur die Besitzerin bzw.
+  der Besitzer (erkannt über einen Schlüssel im Browser) und die DM. Das ist keine echte Anmeldung.

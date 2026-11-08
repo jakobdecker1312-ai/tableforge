@@ -80,7 +80,7 @@ export default function LandingPage() {
 
         <section id="vorlagen" className="py-10">
           <h2 className="mb-5 font-serif-hero text-3xl text-stone-100">
-            <span className="mr-2 text-amber-500">🔥</span>Das macht TableForge besonders
+            <span className="mr-2 text-amber-500">🔥</span>Das macht Tavern Roll besonders
           </h2>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {HIGHLIGHTS.map((h) => (
@@ -101,7 +101,7 @@ export default function LandingPage() {
         </section>
 
         <footer className="border-t border-amber-900/30 py-8 text-center font-fell text-base text-stone-500">
-          TableForge · Ein Virtual Tabletop für deine Runde
+          Tavern Roll · Ein Virtual Tabletop für deine Runde
         </footer>
       </main>
     </div>

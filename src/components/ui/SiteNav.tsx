@@ -24,7 +24,7 @@ export default function SiteNav({ active = "/" }: { active?: string }) {
         <Link href="/" className="flex items-center gap-3">
           <LogoMark />
           <span className="font-serif-hero text-2xl tracking-wide text-stone-100">
-            Table<span className="text-amber-300">Forge</span>
+            Tavern <span className="text-amber-300">Roll</span>
           </span>
         </Link>
         <nav className="hidden items-center gap-1 md:flex">

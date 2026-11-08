@@ -3,7 +3,7 @@ import { v4 as uuid } from "uuid";
 const KEY = "tableforge:owner-key";
 
 /**
- * Zufälliger Schlüssel pro Browser. Damit erkennt Tableforge, welche Charakterbögen dir gehören.
+ * Zufälliger Schlüssel pro Browser. Damit erkennt Tavern Roll, welche Charakterbögen dir gehören.
  * Das ist keine Anmeldung: Wer den Schlüssel kennt, gilt als Besitzer.
  */
 export function getOwnerKey(): string {

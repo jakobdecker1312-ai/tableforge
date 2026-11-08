@@ -33,7 +33,7 @@ const fell = IM_Fell_English({
 });
 
 export const metadata: Metadata = {
-  title: "Tableforge – Virtual Tabletop für D&D",
+  title: "Tavern Roll – Virtual Tabletop für D&D",
   description:
     "Erstelle einen Tisch, lade deine Gruppe ein und spielt gemeinsam live auf der Karte.",
 };

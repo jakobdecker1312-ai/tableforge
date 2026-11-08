@@ -112,7 +112,7 @@ export default function SheetsTab({
       createSheet(sheet);
       onOpen(sheet.id);
     } catch {
-      setError("Die Datei konnte nicht gelesen werden. Erwartet wird eine Tableforge-JSON-Datei.");
+      setError("Die Datei konnte nicht gelesen werden. Erwartet wird eine Tavern-Roll-JSON-Datei.");
     }
   }
 
@@ -140,7 +140,7 @@ export default function SheetsTab({
         />
         {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
         <p className="mt-2 text-xs text-stone-500">
-          Hochladen funktioniert mit Tableforge-Dateien (JSON), die du in einem Bogen über
+          Hochladen funktioniert mit Tavern-Roll-Dateien (JSON), die du in einem Bogen über
           „Exportieren“ gespeichert hast. So nimmst du Helden zwischen Tischen mit.
         </p>
       </section>

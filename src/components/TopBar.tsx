@@ -40,7 +40,7 @@ export default function TopBar({
         href="/dashboard"
         className="font-decor text-lg font-bold tracking-wide text-stone-100"
       >
-        ⚔️ Table<span className="text-gold">forge</span>
+        ⚔️ Tavern <span className="text-gold">Roll</span>
       </Link>
 
       <button
