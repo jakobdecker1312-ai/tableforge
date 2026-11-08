@@ -309,17 +309,21 @@ body {
     inset 0 0 60px rgba(0, 0, 0, 0.55),
     0 30px 60px rgba(0, 0, 0, 0.6);
 }
-@keyframes die-tumble {
-  0% { transform: translate(-50%, -50%) translate(var(--from-x), var(--from-y)) rotate(0deg) scale(0.4); opacity: 0; }
-  15% { opacity: 1; }
-  70% { transform: translate(-50%, -50%) rotate(540deg) scale(1.15); }
-  100% { transform: translate(-50%, -50%) rotate(720deg) scale(1); opacity: 1; }
+@keyframes die-fly {
+  0% { transform: translate(-50%, -50%) translate(var(--from-x), var(--from-y)) scale(0.5); opacity: 0; }
+  12% { opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 @keyframes die-out {
   to { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
 }
+@keyframes total-in {
+  0%, 70% { opacity: 0; transform: translateY(4px) scale(0.9); }
+  100% { opacity: 1; transform: none; }
+}
+.die-total { animation: total-in 1.5s ease-out both; }
 .die-roll {
-  animation: die-tumble 0.9s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  animation: die-fly 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) both;
 }
 .die-roll.leaving {
   animation: die-out 0.6s ease-in both;
@@ -331,6 +335,7 @@ body {
 .seat-turn { animation: turn-glow 1.6s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
   .die-roll, .die-roll.leaving, .seat-turn { animation: none !important; }
+  .die-total { animation: none !important; }
 }
 
 /* ---------- Stimmungen ---------- */

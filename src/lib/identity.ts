@@ -38,6 +38,7 @@ export function getInitialPresence(): Presence {
     role: "player",
     cursor: null,
     seat: null,
+    charTokenId: null,
   };
 
   if (typeof window === "undefined") return fallback;
@@ -52,6 +53,7 @@ export function getInitialPresence(): Presence {
       role: parsed.role === "dm" ? "dm" : "player",
       cursor: null,
       seat: null,
+      charTokenId: null,
     };
   } catch {
     return fallback;

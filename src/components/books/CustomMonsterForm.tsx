@@ -34,6 +34,7 @@ export default function CustomMonsterForm({
   const [traits, setTraits] = useState("");
   const [actions, setActions] = useState("");
   const [color, setColor] = useState("#b91c1c");
+  const [imageUrl, setImageUrl] = useState("");
 
   function submit(e: FormEvent) {
     e.preventDefault();
@@ -60,6 +61,7 @@ export default function CustomMonsterForm({
       color,
       tokenSize: TOKEN_SIZE[size] ?? 1,
       custom: true,
+      ...(/^https?:\/\//i.test(imageUrl.trim()) ? { imageUrl: imageUrl.trim() } : {}),
     });
   }
 
@@ -105,6 +107,7 @@ export default function CustomMonsterForm({
         Tokenfarbe
         <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="h-7 w-10 rounded border border-stone-700 bg-transparent" />
       </label>
+      <input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="Token-Bild als Link (optional, https://…)" className="field" />
       <div className="flex gap-2">
         <button type="submit" className="btn btn-gold flex-1">Speichern</button>
         <button type="button" onClick={onCancel} className="btn">Abbrechen</button>

@@ -11,6 +11,8 @@ import {
   type Roll,
 } from "@/liveblocks.config";
 import Avatar from "@/components/ui/Avatar";
+import RollDice3D from "@/components/Dice3D";
+import { conditionById } from "@/data/conditions";
 
 /** Sitzplätze als Prozent der Szene. Platz 0 = DM am Kopfende (oben). */
 const LAYOUTS: Record<4 | 8, { x: number; y: number }[]> = {
@@ -32,7 +34,14 @@ const LAYOUTS: Record<4 | 8, { x: number; y: number }[]> = {
   ],
 };
 
-type Sitter = { connectionId: number; name: string; color: string; role: Role; seat: number };
+type Sitter = {
+  connectionId: number;
+  name: string;
+  color: string;
+  role: Role;
+  seat: number;
+  charTokenId: string | null;
+};
 
 type ActiveRoll = { roll: Roll; leaving: boolean };
 
@@ -45,6 +54,11 @@ export default function TableScene({ children }: { children: ReactNode }) {
   const combatActive = useStorage((root) => root.combat.active);
   const initiative = useStorage((root) => root.initiative);
   const rolls = useStorage((root) => root.rolls);
+  const tokens = useStorage((root) => root.tokens);
+  const heroTokens = useMemo(
+    () => Array.from(tokens.values()).filter((t) => !t.isMonster),
+    [tokens]
+  );
 
   const isDM = me.presence.role === "dm";
   const seatSetting = useStorage((root) => root.settings.tableSeats ?? 8);
@@ -60,6 +74,7 @@ export default function TableScene({ children }: { children: ReactNode }) {
         color: me.presence.color,
         role: me.presence.role,
         seat: me.presence.seat ?? -1,
+        charTokenId: me.presence.charTokenId ?? null,
       },
       ...others.map((o) => ({
         connectionId: o.connectionId,
@@ -67,6 +82,7 @@ export default function TableScene({ children }: { children: ReactNode }) {
         color: o.presence.color,
         role: o.presence.role,
         seat: o.presence.seat ?? -1,
+        charTokenId: o.presence.charTokenId ?? null,
       })),
     ].filter((s) => s.seat >= 0 && s.seat < SEAT_COUNT);
     const bySeat = new Map<number, Sitter>();
@@ -168,21 +184,111 @@ export default function TableScene({ children }: { children: ReactNode }) {
             style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
           >
             {sitter ? (
-              <button
-                onClick={() => (isMine ? toggleSeat(index) : undefined)}
-                title={isMine ? "Aufstehen" : sitter.name}
-                className={`flex w-[5.5rem] flex-col items-center gap-0.5 rounded-xl border bg-stone-950/85 px-2 py-1.5 backdrop-blur sm:w-24 ${
-                  yourTurn ? "seat-turn border-emerald-400" : "border-amber-900/60"
-                } ${isMine ? "ring-1 ring-amber-400/60" : ""}`}
-              >
-                <Avatar name={sitter.name} color={sitter.color} role={sitter.role} size={34} />
-                <span className="w-full truncate text-center text-[11px] font-medium text-stone-100">
-                  {sitter.name || "Unbekannt"}
-                </span>
-                <span className="text-[9px] uppercase tracking-wider text-stone-500">
-                  {index === 0 ? "Spielleitung" : yourTurn ? "am Zug" : isMine ? "Du" : "Spieler"}
-                </span>
-              </button>
+              (() => {
+                const hero =
+                  index === 0
+                    ? undefined
+                    : (sitter.charTokenId ? tokens.get(sitter.charTokenId) : undefined) ??
+                      heroTokens.find((t) => t.name === sitter.name);
+                const hasHp = hero?.maxHp !== undefined && hero.maxHp > 0;
+                const hp = hero?.hp ?? hero?.maxHp ?? 0;
+                const pct = hasHp ? Math.max(0, Math.min(1, hp / (hero?.maxHp ?? 1))) : 0;
+                const conds = hero?.conditions ?? [];
+                return (
+                  <div
+                    className={`relative flex w-[6.5rem] flex-col items-center gap-0.5 rounded-xl border bg-stone-950/90 px-2 pb-1.5 pt-2 backdrop-blur sm:w-28 ${
+                      yourTurn ? "seat-turn border-emerald-400" : "border-amber-900/60"
+                    } ${isMine ? "ring-1 ring-amber-400/60" : ""}`}
+                  >
+                    {isMine && (
+                      <button
+                        onClick={() => toggleSeat(index)}
+                        title="Aufstehen"
+                        aria-label="Aufstehen"
+                        className="absolute right-1 top-1 rounded px-1 text-[10px] text-stone-500 hover:text-red-300"
+                      >
+                        ✕
+                      </button>
+                    )}
+                    {hero?.imageUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={hero.imageUrl}
+                        alt=""
+                        className="h-11 w-11 rounded-full border-2 border-amber-200/80 object-cover shadow"
+                        style={{ backgroundColor: hero.color }}
+                      />
+                    ) : (
+                      <Avatar name={hero?.name ?? sitter.name} color={hero?.color ?? sitter.color} role={sitter.role} size={44} />
+                    )}
+                    <span className="w-full truncate text-center text-[11px] font-medium text-stone-100">
+                      {hero?.name ?? (sitter.name || "Unbekannt")}
+                    </span>
+                    {hero && hero.name !== sitter.name && (
+                      <span className="-mt-0.5 w-full truncate text-center text-[9px] text-stone-500">
+                        {sitter.name}
+                      </span>
+                    )}
+                    {hasHp ? (
+                      <div className="w-full">
+                        <div className="h-1.5 overflow-hidden rounded-full border border-black/40 bg-black/60">
+                          <div
+                            className={`h-full ${pct > 0.5 ? "bg-emerald-500" : pct > 0.25 ? "bg-amber-500" : "bg-red-500"}`}
+                            style={{ width: `${pct * 100}%` }}
+                          />
+                        </div>
+                        <div className="mt-0.5 flex justify-between text-[9px] tabular-nums text-stone-400">
+                          <span>
+                            {hp}/{hero?.maxHp}
+                          </span>
+                          {hero?.ac !== undefined && <span>RK {hero.ac}</span>}
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-[9px] uppercase tracking-wider text-stone-500">
+                        {index === 0 ? "Spielleitung" : yourTurn ? "am Zug" : isMine ? "Du" : "Spieler"}
+                      </span>
+                    )}
+                    {conds.length > 0 && (
+                      <div className="flex flex-wrap justify-center gap-0.5">
+                        {conds.slice(0, 4).map((id) => {
+                          const info = conditionById(id);
+                          return info ? (
+                            <span
+                              key={id}
+                              title={info.name}
+                              className="flex h-3.5 min-w-3.5 items-center justify-center rounded-full px-0.5 text-[7px] font-bold text-stone-900"
+                              style={{ backgroundColor: info.color }}
+                            >
+                              {info.short}
+                            </span>
+                          ) : null;
+                        })}
+                      </div>
+                    )}
+                    {yourTurn && (
+                      <span className="text-[9px] font-semibold uppercase tracking-wider text-emerald-300">
+                        am Zug
+                      </span>
+                    )}
+                    {isMine && index !== 0 && (
+                      <select
+                        value={sitter.charTokenId ?? ""}
+                        onChange={(e) => updatePresence({ charTokenId: e.target.value || null })}
+                        aria-label="Mein Held"
+                        className="mt-0.5 w-full truncate rounded border border-stone-700 bg-stone-900 px-1 py-0.5 text-[9px] text-stone-300"
+                      >
+                        <option value="">Held wählen …</option>
+                        {heroTokens.map((t) => (
+                          <option key={t.id} value={t.id}>
+                            {t.name}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
+                );
+              })()
             ) : (
               <button
                 onClick={() => toggleSeat(index)}
@@ -206,9 +312,8 @@ export default function TableScene({ children }: { children: ReactNode }) {
       {active.map(({ roll, leaving }) => {
         const from = seatOfRoller(roll.playerName);
         // Würfel landet am Kartenrand vor dem Platz.
-        const x = from.x + (50 - from.x) * 0.22;
-        const y = from.y + (50 - from.y) * 0.22;
-        const crit = roll.sides === 20 && roll.count === 1 && (roll.results[0] === 20 || roll.results[0] === 1);
+        const x = from.x + (50 - from.x) * 0.3;
+        const y = from.y + (50 - from.y) * 0.3;
         return (
           <div
             key={roll.id}
@@ -222,23 +327,7 @@ export default function TableScene({ children }: { children: ReactNode }) {
               } as CSSProperties
             }
           >
-            <div
-              className={`flex min-w-12 flex-col items-center rounded-xl border-2 px-2.5 py-1 shadow-xl ${
-                roll.secret
-                  ? "border-purple-400 bg-purple-950/90 text-purple-100"
-                  : crit && roll.results[0] === 20
-                    ? "border-emerald-300 bg-emerald-950/95 text-emerald-200"
-                    : crit
-                      ? "border-red-300 bg-red-950/95 text-red-200"
-                      : "border-amber-300 bg-stone-950/95 text-amber-100"
-              }`}
-            >
-              <span className="text-[9px] text-stone-400">
-                {roll.count > 1 ? roll.count : ""}W{roll.sides}
-                {roll.modifier ? (roll.modifier > 0 ? `+${roll.modifier}` : roll.modifier) : ""}
-              </span>
-              <span className="font-display text-xl font-bold leading-none">{roll.total}</span>
-            </div>
+            <RollDice3D roll={roll} />
           </div>
         );
       })}

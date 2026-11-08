@@ -23,6 +23,8 @@ export type Monster = {
   tokenSize: number;
   /** Selbst erstellt (lokal gespeichert). */
   custom?: boolean;
+  /** Optionales Token-Bild (Link). */
+  imageUrl?: string;
 };
 
 const CR_VALUES: Record<string, number> = {

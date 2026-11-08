@@ -11,6 +11,8 @@ export type Presence = {
   cursor: { x: number; y: number } | null;
   /** Sitzplatz am Tisch (0 = DM-Platz, 1–7 = Spieler), null = steht. */
   seat: number | null;
+  /** Token des eigenen Helden (für Bild und TP am Sitzplatz). */
+  charTokenId: string | null;
 };
 
 /** Ein Token auf der Map. x/y sind relative Werte (0–1). */
@@ -29,6 +31,8 @@ export type Token = {
   ac?: number;
   /** IDs aktiver Zustände, z. B. "poisoned". */
   conditions?: string[];
+  /** Bild des Tokens (Link oder kleines Daten-Bild). */
+  imageUrl?: string;
 };
 
 /** Einstellungen der Map. */

@@ -8,6 +8,7 @@ import { PALETTE } from "@/lib/identity";
 import { spawnPosition, TOKEN_SIZES, exploreAround } from "@/lib/map";
 import { useVision } from "@/lib/useVision";
 import { PlusIcon, SkullIcon, TrashIcon } from "@/components/ui/Icons";
+import TokenImageEditor from "@/components/TokenImageEditor";
 
 const MONSTER_PRESETS = [
   { name: "Goblin", color: "#16a34a", size: 1 },
@@ -80,6 +81,9 @@ export default function TokensTab({
       ...spawnPosition(),
     });
   }
+
+  const selectedToken = tokens.find((t) => t.id === selectedId) ?? null;
+  const canEditImage = Boolean(selectedToken && (isDM || !selectedToken.isMonster));
 
   return (
     <div className="space-y-6">
@@ -189,6 +193,8 @@ export default function TokensTab({
           </ul>
         )}
       </section>
+
+      {selectedToken && canEditImage && <TokenImageEditor token={selectedToken} />}
     </div>
   );
 }

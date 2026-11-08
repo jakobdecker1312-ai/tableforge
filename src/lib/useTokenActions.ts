@@ -118,6 +118,7 @@ export function useTokenActions() {
         hp: monster.hp,
         maxHp: monster.hp,
         ac: monster.ac,
+        ...(monster.imageUrl ? { imageUrl: monster.imageUrl } : {}),
         ...spawnPosition(),
       });
     }

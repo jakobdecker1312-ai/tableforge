@@ -411,7 +411,22 @@ export default function MapView({
                   fontSize: `max(10px, ${size * 2}cqw)`,
                 }}
               >
-                {token.isMonster ? "☠" : initials(token.name)}
+                {token.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={token.imageUrl}
+                    alt=""
+                    draggable={false}
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                    }}
+                    className="pointer-events-none h-full w-full object-cover"
+                  />
+                ) : token.isMonster ? (
+                  "☠"
+                ) : (
+                  initials(token.name)
+                )}
               </div>
               {conditions.length > 0 && (
                 <div className="pointer-events-none absolute bottom-full left-1/2 mb-0.5 flex -translate-x-1/2 gap-0.5">
